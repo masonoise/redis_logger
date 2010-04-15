@@ -1,6 +1,6 @@
 = redis_logger
 
-Description goes here.
+Application logging to redis.
 
 == Note on Patches/Pull Requests
  
@@ -14,4 +14,4 @@ Description goes here.
 
 == Copyright
 
-Copyright (c) 2010 mason. See LICENSE for details.
+Copyright (c) 2010 Mason Jones. See LICENSE for details.

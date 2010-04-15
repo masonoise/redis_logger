@@ -1,6 +1,9 @@
 require 'redis'
 
 #
+# redis_logger
+# http://github.com/masonoise/redis_logger
+#
 # Enable logging into redis database, with support for grouping log entries into one or more
 # groups.
 #
@@ -74,6 +77,22 @@ class RedisLogger
   #
   def self.entries(group, start=0, per_page=50)
     entry_list = redis.sort("logger:set:#{group}", { :limit => [ start, per_page ], :order => "DESC" })
+    fetch_entries(entry_list)
+  end
+
+  #
+  # Get the entries for an intersection of groups. Takes an array of group names and
+  # returns the resulting entries.
+  #
+  def self.intersect(groups)
+    entry_list = redis.sinter(groups.collect {|g| "logger:set:#{g}"})
+    fetch_entries(entry_list)
+  end
+
+  #
+  # Utility method to fetch entries given an array returned from a group set.
+  #
+  def self.fetch_entries(entry_list)
     entries = []
     entry_list.each do |e|
       entries << redis.hgetall("log:#{e}")

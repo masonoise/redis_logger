@@ -5,11 +5,12 @@ begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
     gem.name = "redis_logger"
-    gem.summary = %Q{TODO: one-line summary of your gem}
-    gem.description = %Q{TODO: longer description of your gem}
+    gem.summary = %Q{Enable logging to Redis database}
+    gem.description = %Q{Provides support for logging to a Redis database, including grouping log entries and timestamping}
     gem.email = "mason@rpxcorp.com"
     gem.homepage = "http://github.com/masonoise/redis_logger"
-    gem.authors = ["mason"]
+    gem.authors = ["masonoise"]
+    gem.add_dependency('redis', '>= 1.0.4')
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
   end
   Jeweler::GemcutterTasks.new

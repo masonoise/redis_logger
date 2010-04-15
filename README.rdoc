@@ -2,6 +2,36 @@
 
 Application logging to redis.
 
+== Installation
+
+  sudo gem install redis_logger
+
+You will also want to install the web interface for viewing the log entries:
+
+  sudo gem install redis_logger_web
+
+
+== Using
+
+1. Install redis
+
+2. In your application code, place a call to RedisLogger, using one of: debug, warn, error. Each call is expected to pass a Hash of data, and an optional list of groups to which you want the log entry to belong. For example, you might want to log all of your requests to a group called "requests", so you might put this call into your application_controller.rb file in a before_filter:
+
+ RedisLogger.debug({ "request" => request.url,
+                        "remote_ip" => request.remote_ip,
+                        "user_id" => current_user.id,
+                        "username" => current_user.email
+ }, "requests")
+
+That would store the Hash containing four key/value pairs into the log entry, place it automatically in the
+"debug" group of entries, and also in the "requests" group of entries. Elsewhere in your code, you might log
+all user signup activity into a "signup" group, for example. Using the web interface, you can view the entries
+in a group or all the entries in an intersection of multiple groups -- for example, all errors in the signup
+process.
+
+
+---
+
 == Note on Patches/Pull Requests
  
 * Fork the project.

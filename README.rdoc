@@ -2,20 +2,27 @@
 
 Application logging to redis.
 
+== Version
+
+Version 0.1.0
+
 == Installation
 
   sudo gem install redis_logger
 
 You will also want to install the web interface for viewing the log entries:
 
-  sudo gem install redis_logger_web
+  http://github.com/masonoise/redis_logger-web
 
 
-== Using
+== Using RedisLogger
 
-1. Install redis
+1. Install redis (http://code.google.com/p/redis/) and redis_logger
 
-2. In your application code, place a call to RedisLogger, using one of: debug, warn, error. Each call is expected to pass a Hash of data, and an optional list of groups to which you want the log entry to belong. For example, you might want to log all of your requests to a group called "requests", so you might put this call into your application_controller.rb file in a before_filter:
+2. In your application code, place a call to RedisLogger, using one of: debug, warn, error. Each call is expected to
+   pass a Hash of data, and an optional list of groups to which you want the log entry to belong. For example, you
+   might want to log all of your requests to a group called "requests", so you might put this call into your
+   application_controller.rb file in a before_filter:
 
  RedisLogger.debug({ "request" => request.url,
                         "remote_ip" => request.remote_ip,
@@ -29,11 +36,32 @@ all user signup activity into a "signup" group, for example. Using the web inter
 in a group or all the entries in an intersection of multiple groups -- for example, all errors in the signup
 process.
 
+If you want to use redis-cli to look things over instead of the web interface, here are the basics:
 
----
+  ./redis-cli
+  sort logger:set:debug limit 0 10 desc
+  ==> returns most recent 10 keys from the debug group, each of which maps to a Hash of log fields
+  hgetall log:1271274209
+  ==> returns the keys and values for that log entry
+  smembers logger:sets
+  ==> returns list of the groups that have been logged into
 
-== Note on Patches/Pull Requests
- 
+== Known Issues
+
+1. Currently the log keys are simply the longint timestamps of each entry. If multiple threads are going
+   it's very possible that they'll log at the same instant and only one entry will survive. Need to work
+   out a way to identify each server with a unique id that could be added to the log keys, such as
+   log:1:<timestamp>, log:2:<timestamp>, etc.
+2. It would be nice to cache the group names so it doesn't have to add the group to logger:sets each time.
+3. Support for viewing intersection of groups is limited to most recent 100 entries right now. It will
+   be nice to keep the stored intersection set around for viewing, pagination, and export, but we need to
+   have a way to clean up the stored sets periodically.
+
+== Contributing
+
+This is very young and simple thus far. If you have some cool ideas, go for it, give it a try, if it seems
+good to you then get in touch and we'll see about merging it in.
+
 * Fork the project.
 * Make your feature addition or bug fix.
 * Add tests for it. This is important so I don't break it in a
@@ -42,6 +70,7 @@ process.
   (if you want to have your own version, that is fine but bump version in a commit by itself I can ignore when I pull)
 * Send me a pull request. Bonus points for topic branches.
 
-== Copyright
+== Author
 
-Copyright (c) 2010 Mason Jones. See LICENSE for details.
+Mason Jones ~~~ stuff@charnel.com ~~~ @masonoise
+

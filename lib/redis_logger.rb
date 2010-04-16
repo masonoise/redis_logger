@@ -40,10 +40,12 @@ class RedisLogger
     add_entry(log_entry, "debug", sets)
   end
 
+
   def self.warn(log_entry, sets = nil)
     add_entry(log_entry, "warn", sets)
   end
 
+  # Standard method for error messages. See comment above about debug()
   def self.error(log_entry, sets = nil)
     add_entry(log_entry, "error", sets)
   end
@@ -82,11 +84,17 @@ class RedisLogger
 
   #
   # Get the entries for an intersection of groups. Takes an array of group names and
-  # returns the resulting entries.
+  # returns the top 100 resulting entries. This is done by intersecting into a new set,
+  # fetching the first 100 entries, then deleting the set.
+  # TODO: Save the intersected set, allow paginating, and use a cron to delete the temp sets
   #
   def self.intersect(groups)
-    entry_list = redis.sinter(groups.collect {|g| "logger:set:#{g}"})
-    fetch_entries(entry_list)
+    counter = redis.incrby("logger:index", 1)
+    redis.sinterstore("logger:inter:#{counter}", groups.collect {|g| "logger:set:#{g}"})
+    entry_list = redis.sort("logger:inter:#{counter}", { :limit => [ 0, 100 ], :order => "DESC" })
+    entries = fetch_entries(entry_list)
+    redis.del("logger:inter:#{counter}")
+    return entries
   end
 
   #

@@ -131,11 +131,11 @@ class RedisLogger
         sets = []
     end
     # TODO: Shouldn't need to add the level every time; could do it once at startup?
-    redis.set_add "logger:sets", level
-    redis.set_add "logger:set:#{level}", tstamp
+    redis.sadd "logger:sets", level
+    redis.sadd "logger:set:#{level}", tstamp
     sets.each do |set|
-      redis.set_add "logger:sets", set
-      redis.set_add "logger:set:#{set}", tstamp
+      redis.sadd "logger:sets", set
+      redis.sadd "logger:set:#{set}", tstamp
     end
   end
 end
